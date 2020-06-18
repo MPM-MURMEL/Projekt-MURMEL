@@ -17,6 +17,8 @@
 * A simple main function to demonstrate the creation and usage of a server socket.
 *
 * @example TEST_TCPServer.cpp
+* @example TEST_TCPServer_Json.cpp
+* @example TEST_TCPServer_KinovaJaco.cpp
 */
 
 /**

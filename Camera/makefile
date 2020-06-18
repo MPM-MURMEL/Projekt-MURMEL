@@ -1,16 +1,17 @@
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
-
 SDIR=./src
 BDIR=./bin
 EDIR=./example
 DDIR=./doc
 
 IDIR=-I./include -I/usr/include -I/usr/local/include -I/usr/local/include/opencv4
-LDIR=-L./lib -L/usr/lib -L/usr/local/lib
+LDIR=-L./lib -L/usr/lib -L/usr/local/lib -L/usr/local/lib -L./lib/OpenNI2/Drivers/
 
-libs= -ldl -ljsoncpp -lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgproc -lopencv_imgcodecs
+libs= -ldl -ljsoncpp -lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgproc -lopencv_imgcodecs -lOniFile -lOpenNI2 -lorbbec -lPSLink
+
 
 RPATH = -Wl,-rpath,/usr/local/lib/
+RPATH += -Wl,-rpath,lib
+RPATH += -Wl,-rpath,lib/OpenNI2/Drivers/
 
 CC=g++
 CFLAGS= -std=c++11 $(RPATH) $(IDIR) $(LDIR) $(libs)
@@ -27,7 +28,7 @@ clean:
 
 
 documentation:
-	cd $(DDIR); doxygen Camera.conf; cd ..
+	cd $(DDIR); doxygen Documentation.conf;
 
 
 main: TCPServer.o KeyholeDetection.o
@@ -39,6 +40,8 @@ example: TCPServer.o KeyholeDetection.o
 	$(CC)  $(EDIR)/TEST_TCPServer_KinovaJaco.cpp $(BDIR)/*.o -o $(BDIR)/TEST_TCPServer_KinovaJaco $(CFLAGS)
 	$(CC)  $(EDIR)/TEST_TCPServer_Json.cpp $(BDIR)/*.o -o $(BDIR)/TEST_TCPServer_Json $(CFLAGS)
 	$(CC)  $(EDIR)/TEST_OpenCV.cpp $(BDIR)/*.o -o $(BDIR)/TEST_OpenCV $(CFLAGS)
+	$(CC)  $(EDIR)/TEST_OpenNI.cpp $(BDIR)/*.o -o $(BDIR)/TEST_OpenNI $(CFLAGS)
+
 
 TCPServer.o: $(SDIR)/TCPServer.cpp
 	$(CC) -c $(SDIR)/TCPServer.cpp -o $(BDIR)/TCPServer.o $(CFLAGS)

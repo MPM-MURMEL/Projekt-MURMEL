@@ -4,7 +4,7 @@
 KinovaJaco2::KinovaJaco2()
 {
 	//load the library
-    	commandLayer_handle = dlopen("lib/Kinova.API.EthCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
+    commandLayer_handle = dlopen("lib/Kinova.API.EthCommandLayerUbuntu.so",RTLD_NOW|RTLD_GLOBAL);
 	
 	//load the functions from the library
 	initAPI = (int (*)()) dlsym(commandLayer_handle,"Ethernet_InitAPI");
@@ -87,7 +87,6 @@ TrajectoryPoint KinovaJaco2::convertReferenceFrame(CartesianPosition &pose, Traj
 	//translation vector in base frame
 	Eigen::Vector3f translation_vector_base_frame = orientation_robot * translation_vector_ee_frame;
 
-
 	//update the x-y-z part of the command
 	cmdOut.Position.CartesianPosition.X = translation_vector_base_frame(0); // X
 	cmdOut.Position.CartesianPosition.Y = translation_vector_base_frame(1); // Y
@@ -115,8 +114,12 @@ void KinovaJaco2::sendHomeTrajectory()
 	cmd.Position.Fingers.Finger2 = 0;
 	cmd.Position.Fingers.Finger3 = 0;
 
-	// send home position	
-	sendScheduledTrajectory(cmd);
+	while (!isAtTarget(cmd))
+	{
+		// send home position	
+		sendScheduledTrajectory(cmd);
+	}
+
 }
 
 
@@ -137,8 +140,11 @@ void KinovaJaco2::sendRetractedTrajectory()
 	cmd.Position.Fingers.Finger2 = 0;
 	cmd.Position.Fingers.Finger3 = 0;
 
-	// send home position
-	sendScheduledTrajectory(cmd);
+	while (!isAtTarget(cmd))
+	{
+		// send home position
+		sendScheduledTrajectory(cmd);
+	}
 }
 
 
@@ -155,6 +161,47 @@ void KinovaJaco2::sendScheduledTrajectory(TrajectoryPoint trajectory)
 	} 
 	while(trajFifo.TrajectoryCount >=1);
 	sleepMs(5);
+}
+
+
+bool KinovaJaco2::isAtTarget(TrajectoryPoint target_trajectory)
+{
+	if (target_trajectory.Position.Type == ANGULAR_POSITION)
+	{
+		//get the current Cartesian position
+		AngularPosition current_angles;
+		getAngularCommand(current_angles);
+
+		// add all errors of translation
+		double error = abs(current_angles.Actuators.Actuator1 - target_trajectory.Position.Actuators.Actuator1)
+		+ abs(current_angles.Actuators.Actuator2 - target_trajectory.Position.Actuators.Actuator2)
+		+ abs(current_angles.Actuators.Actuator3 - target_trajectory.Position.Actuators.Actuator3)
+		+ abs(current_angles.Actuators.Actuator4 - target_trajectory.Position.Actuators.Actuator4)
+		+ abs(current_angles.Actuators.Actuator5 - target_trajectory.Position.Actuators.Actuator5)
+		+ abs(current_angles.Actuators.Actuator6 - target_trajectory.Position.Actuators.Actuator6);
+
+		return error < 0.1;
+	}
+	else if (target_trajectory.Position.Type == CARTESIAN_POSITION)
+	{
+		//get the current Cartesian position
+		CartesianPosition current_pos;
+		getCartesianCommand(current_pos);
+
+		// add all errors of translation
+		double error_trans = abs(current_pos.Coordinates.X - target_trajectory.Position.CartesianPosition.X)
+		+ abs(current_pos.Coordinates.Y - target_trajectory.Position.CartesianPosition.Y)
+		+ abs(current_pos.Coordinates.Z - target_trajectory.Position.CartesianPosition.Z);
+
+		//add all errors of rotation
+	 	double error_angle = abs(current_pos.Coordinates.ThetaX - target_trajectory.Position.CartesianPosition.ThetaX)
+		+ abs(current_pos.Coordinates.ThetaY - target_trajectory.Position.CartesianPosition.ThetaY)
+		+ abs(current_pos.Coordinates.ThetaZ - target_trajectory.Position.CartesianPosition.ThetaZ);
+
+		return error_trans < 0.01 && error_angle < 1;
+	}
+
+	return false;
 }
 
 

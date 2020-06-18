@@ -22,7 +22,7 @@ clean:
 
 
 documentation:
-	cd $(DDIR); doxygen Controll.conf; cd ..
+	cd $(DDIR); doxygen Documentation.conf; cd ..
 
 
 main: KinovaJaco2.o TCPClient.o PIDController.o ExponentialFilter.o

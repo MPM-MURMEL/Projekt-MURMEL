@@ -283,6 +283,16 @@ class KinovaJaco2
 	void sendScheduledTrajectory(TrajectoryPoint trajectory);
 
 	/**
+	* @brief Target status
+	*
+	* Compares a desired trajectory with the current position to check if target location was reached
+	*
+	* @param trajectory Target trajectory
+	* @return true if at target location
+	*/
+	bool isAtTarget(TrajectoryPoint target_trajectory);
+
+	/**
 	* @brief Sleep milliseconds
 	*
 	* @param ms Milliseconds to sleep
@@ -309,6 +319,7 @@ class KinovaJaco2
 	* @return API Layer information used for connection
 	*/
 	int(*initEthernetAPI)(EthernetCommConfig & config);
+
 
 	/**
 	* @brief Close API
