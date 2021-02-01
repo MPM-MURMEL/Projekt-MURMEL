@@ -1,0 +1,8 @@
+# Goal
+geometry_msgs/PoseStamped pose
+---
+# Result
+geometry_msgs/PoseStamped pose
+---
+# Feedback
+geometry_msgs/PoseStamped pose

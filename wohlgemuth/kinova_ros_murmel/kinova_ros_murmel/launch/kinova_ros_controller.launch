@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+	<include file="$(find kinova_bringup)/launch/kinova_robot.launch"/>
+	<node name="kinova_ros_murmel_node" pkg="kinova_ros_murmel" type="kinova_ros_murmel" output="screen">
+		<rosparam command="load" file="$(find kinova_ros_murmel)/config/config.yaml"/>
+	</node>
+</launch>

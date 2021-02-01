@@ -1,0 +1,1 @@
+Dieser Ordner inklusive Bilder und Trainingsschirrte  ist in der TUBCloud zu finden unter 05_Software/01_SoftwareArchitekturMURMEL/0104_Modules_MURMEL/Objektrecognition/06_Bartsch_ObjectDetection/Objekterkennung/object_detection
